@@ -1,0 +1,38 @@
+<div class="container">
+  <p class="order-header">Ваше замовлення</p>
+
+  <div class="card" *ngFor="let item of cart$ | async">
+    <div class="card-image">
+      <img [src]="item.image" alt="" />
+    </div>
+    <div class="card-info">
+      <div class="card-info-title">
+        <span>{{ item.title }}</span>
+      </div>
+
+      <div class="card-info-price">
+        <div class="card-info-price_count">
+          <span>{{ item.price }}₴</span>
+          <span class="x">X</span>
+          <span>{{ item.qty }}</span>
+        </div>
+        <div class="card-info-total">
+          <span>{{ item.price * item.qty }}₴</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="total-price">
+    <span class="total-price-text">До сплати</span>
+    <span class="total-price-count">{{ totalPrice$ | async }}₴</span>
+  </div>
+
+  <button class="btn btn-footer" (click)="order()">Оплатити</button>
+  <button class="btn btn-footer" [routerLink]="['/fridge-menu']">
+    До покупок
+  </button>
+  <button class="btn btn-footer" (click)="clearCart()">Очистити кошик</button>
+</div>

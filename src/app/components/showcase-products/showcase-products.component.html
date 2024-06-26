@@ -1,0 +1,43 @@
+<div class="container showcase-wrapper">
+  <div
+    class="card-wrapper"
+    *ngFor="let item of fridgeStore?.products; let i = index"
+  >
+    <div class="card">
+      <div class="card-img">
+        <img [src]="item.image" alt="" />
+      </div>
+      <div class="card-info">
+        <span class="card-info-title">{{ item.title }}</span>
+
+        <span class="card-info-description">{{ item.description }}</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-price">
+          <span class="card-footer-price__text">Ціна за шт:</span>
+          <span>{{ item.price }}₴</span>
+        </div>
+
+        <div class="card-footer-btn">
+          <div class="btn counter">
+            <button (click)="decrement(i)">-</button>
+            <span>{{ item.count || 0 }}</span>
+            <button (click)="increment(i)">+</button>
+          </div>
+          <button
+            class="btn"
+            [disabled]="item.count === 0"
+            (click)="addToCart(item, item.count)"
+          >
+            Додати в кошик
+          </button>
+        </div>
+      </div>
+      <!-- <button (click)="clearCart()">Очистити кошик</button> -->
+    </div>
+  </div>
+
+  <button *ngIf="!isEmpty" class="btn btn-pay" [routerLink]="['/cart']">
+    Перейти до оплати
+  </button>
+</div>

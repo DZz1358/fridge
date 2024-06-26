@@ -1,0 +1,76 @@
+.container {
+  flex-direction: column;
+  padding: 0 24px;
+  max-width: 380px;
+
+}
+
+.order-header {
+  font-size: 20px;
+  margin-bottom: 46px;
+}
+
+.hr {
+  border: 2px solid #495DC7;
+}
+
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 26px 0;
+  padding: 0 10px;
+  font-weight: 700;
+
+  &-text {
+    font-size: 20px;
+  }
+
+  &-count {
+    font-size: 28px;
+  }
+}
+
+.card {
+  margin-bottom: 60px;
+  display: flex;
+
+
+  &-image>img {
+    width: 82px;
+    height: 82px;
+    margin-right: 15px;
+  }
+
+  &-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &-title {
+      font-size: 18px;
+    }
+
+    &-price {
+      padding-top: 15px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 28px;
+    }
+
+    &-total {
+      font-size: 28px;
+      font-weight: 700;
+      margin-right: 15px;
+    }
+  }
+}
+
+.x {
+  margin: 0 10px;
+}
+
+.btn-footer {
+  margin-bottom: 20px;
+}
