@@ -33,15 +33,18 @@ export class CartComponent implements OnInit {
 
   order() {
     let order: { id: any; qty: any; }[] = []
-    this.cart$.forEach((item: any) => {
-      order.push({
-        id: item.id,
-        qty: item.qty
-      })
-    });
+
+    this.cart$.subscribe((res: any) => {
+      res.forEach((item: any) => {
+        order.push({
+          id: item.id,
+          qty: item.qty
+        })
+      });
+
+    })
 
     this.fridgeService.sendOrder(order).subscribe((res: any) => {
-      console.log('res', res);
       let url = res.payment_link
       window.open(url, '_blank');
     })
