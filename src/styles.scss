@@ -11,6 +11,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 .container {
@@ -33,4 +34,20 @@ body {
     background-color: #fff;
     cursor: no-drop;
   }
+}
+
+
+.btn-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &-counter {
+    background-color: transparent;
+    border-radius: 8px;
+    border: 1px solid #495DC7;
+    padding: 5px 25px;
+  }
+
+  // &>button {}
 }

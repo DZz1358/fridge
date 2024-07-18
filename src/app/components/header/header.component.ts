@@ -2,6 +2,7 @@ import { Component, OnChanges, OnInit, SimpleChanges, computed, inject, signal }
 import { FridgeService } from '../../services/fridge.service';
 import { Observable, map } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -12,21 +13,25 @@ import { AsyncPipe } from '@angular/common';
 })
 export class HeaderComponent implements OnInit {
   cart$: Observable<any[]>;
-  totalPrice$: Observable<number>;
+  totalPrice!: number;
   fridgeService = inject(FridgeService);
+  fridgeName!: any;
+  fridgeId!: any;
 
-  constructor() {
+  constructor(private route: ActivatedRoute) {
     this.cart$ = this.fridgeService.getCart();
-    this.totalPrice$ = this.cart$.pipe(
-      map(cart => cart.reduce((acc, curr) => acc + (+curr.price * curr.qty), 0)),
-    );
-    this.totalPrice$.subscribe((totalPrice) => {
-      console.log('totalPrice', totalPrice);
+
+    this.fridgeService.currentFridgeId.subscribe(id => {
+      this.fridgeId = id;
+    });
+
+    this.cart$.subscribe((res: any) => {
+      this.totalPrice = res.reduce((acc: any, curr: any) => acc + (+curr.price * curr.count), 0)
     })
+
   }
 
   ngOnInit(): void {
-    // Initial load
     this.fridgeService.getCart().subscribe();
   }
 }

@@ -1,38 +1,52 @@
 <div class="container">
-  <p class="order-header">Ваше замовлення</p>
+  <div *ngIf="totalPrice !== 0">
+    <p class="order-header">Ваше замовлення</p>
 
-  <div class="card" *ngFor="let item of cart$ | async">
-    <div class="card-image">
-      <img [src]="item.image" alt="" />
+    <div class="card" *ngFor="let item of cart$ | async">
+      <div class="card-image">
+        <img [src]="item.image" alt="" />
+      </div>
+      <div class="card-info">
+        <div class="card-info-title">
+          <span>{{ item.title }}</span>
+        </div>
+
+        <div class="card-info-price">
+          <div class="card-info-price_count">
+            <span>{{ item.price }}₴</span>
+            <span class="x">за шт.</span>
+            <!-- <span>{{ item.count }}</span> -->
+          </div>
+          <!-- <div class="card-info-total">
+            <span>{{ item.price * item.count }}₴</span>
+          </div> -->
+        </div>
+        <div class="btn-wrapper">
+          <button class="btn counter" (click)="decrement(item.id)">-</button>
+          <span class="btn-wrapper-counter">{{ item.count }}</span>
+          <button class="btn counter" (click)="increment(item)">+</button>
+        </div>
+      </div>
     </div>
-    <div class="card-info">
-      <div class="card-info-title">
-        <span>{{ item.title }}</span>
-      </div>
 
-      <div class="card-info-price">
-        <div class="card-info-price_count">
-          <span>{{ item.price }}₴</span>
-          <span class="x">X</span>
-          <span>{{ item.qty }}</span>
-        </div>
-        <div class="card-info-total">
-          <span>{{ item.price * item.qty }}₴</span>
-        </div>
-      </div>
+    <div class="hr"></div>
+
+    <div class="total-price">
+      <span class="total-price-text">До сплати</span>
+      <span class="total-price-count">{{ totalPrice }}₴</span>
+    </div>
+
+    <div class="button-wrapper">
+      <button class="btn btn-footer" (click)="sendOrder()">Оплатити</button>
+      <button class="btn btn-footer" (click)="clearCart()">
+        Очистити кошик
+      </button>
     </div>
   </div>
 
-  <div class="hr"></div>
-
-  <div class="total-price">
-    <span class="total-price-text">До сплати</span>
-    <span class="total-price-count">{{ totalPrice$ | async }}₴</span>
+  <div class="empty-cart" *ngIf="totalPrice === 0">
+    <h3>Кошик пустий</h3>
   </div>
 
-  <button class="btn btn-footer" (click)="order()">Оплатити</button>
-  <button class="btn btn-footer" [routerLink]="['/fridge-menu']">
-    До покупок
-  </button>
-  <button class="btn btn-footer" (click)="clearCart()">Очистити кошик</button>
+  <button class="btn btn-footer" (click)="back()">До покупок</button>
 </div>

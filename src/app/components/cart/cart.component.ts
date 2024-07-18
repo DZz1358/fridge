@@ -1,54 +1,68 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FridgeService } from '../../services/fridge.service';
-import { AsyncPipe, NgFor } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Observable, map } from 'rxjs';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [NgFor, RouterModule, AsyncPipe],
+  imports: [NgFor, NgIf, RouterModule, AsyncPipe],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
 })
 export class CartComponent implements OnInit {
   cart$!: Observable<any[]>;
-  totalPrice$!: Observable<number>;
+  totalPrice: number = 0;
 
-
+  fridgeId!: string;
+  fridgeName: any = '';
   fridgeService = inject(FridgeService);
 
-  constructor(private router: Router) {
-
+  constructor(private router: Router, private route: ActivatedRoute,) {
   }
   ngOnInit(): void {
     this.cart$ = this.fridgeService.getCart();
+    this.cart$.subscribe((res: any) => {
+      this.totalPrice = res.reduce((acc: any, curr: any) => acc + (+curr.price * curr.count), 0)
+    })
 
-    this.totalPrice$ = this.cart$.pipe(
-      map(cart => cart.reduce((acc, curr) => acc + (+curr.price * curr.qty), 0)),
-    );
+    this.route.paramMap.subscribe(params => {
+      this.fridgeId = params.get('id')!;
+    });
 
   }
 
+  increment(item: any) {
+    this.fridgeService.addToCart(item);
+  }
 
-  order() {
+  decrement(index: string) {
+    this.fridgeService.removeFromCart(index);
+  }
+
+  sendOrder() {
     let order: { id: any; qty: any; }[] = []
 
     this.cart$.subscribe((res: any) => {
       res.forEach((item: any) => {
         order.push({
           id: item.id,
-          qty: item.qty
+          qty: item.count
         })
       });
-
     })
 
-    this.fridgeService.sendOrder(order).subscribe((res: any) => {
+    this.fridgeService.sendOrder(order, this.fridgeId).subscribe((res: any) => {
       let url = res.payment_link
-      window.open(url, '_blank');
+      window.location.href = url;
     })
     console.log('order', order);
+  }
+
+
+  back() {
+    this.router.navigate([`fridge-menu/${this.fridgeId}`])
   }
 
   clearCart() {

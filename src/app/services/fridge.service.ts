@@ -8,10 +8,19 @@ import { BehaviorSubject } from 'rxjs';
 export class FridgeService {
   private cartSubject = new BehaviorSubject<any[]>([]);
   API_URL = 'https://fridge.api.w3b.services';
-  ID = '66a6805f-70e2-4670-923e-2910ee5ad79b';
 
-  constructor(private http: HttpClient) {
+  private fridgeIdSource = new BehaviorSubject<string>('');
+  private fridgeIdSubject = new BehaviorSubject<string | null>(null);
+
+  currentFridgeId = this.fridgeIdSource.asObservable();
+
+  constructor(private http: HttpClient,
+  ) {
     this.loadCartFromLocalStorage();
+  }
+
+  changeFridgeId(id: string) {
+    this.fridgeIdSource.next(id);
   }
 
   private loadCartFromLocalStorage() {
@@ -31,9 +40,29 @@ export class FridgeService {
     const productInCart = currentCart.find(cartItem => cartItem.id === item.id);
 
     if (productInCart) {
-      productInCart.qty += item.qty;
+      productInCart.count++;
     } else {
+      item.count = 1;
       currentCart.push(item);
+    }
+
+    this.saveCartToLocalStorage(currentCart);
+    this.cartSubject.next(currentCart);
+  }
+
+  removeFromCart(id: string) {
+    const currentCart = this.cartSubject.value;
+
+    const productIndex = currentCart.findIndex(cartItem => cartItem.id === id);
+
+    if (productIndex !== -1) {
+      const productInCart = currentCart[productIndex];
+
+      if (productInCart.count > 1) {
+        productInCart.count--;
+      } else {
+        currentCart.splice(productIndex, 1);
+      }
     }
 
     this.saveCartToLocalStorage(currentCart);
@@ -53,7 +82,7 @@ export class FridgeService {
     return this.http.get(`${this.API_URL}/fridge/${id}/store`);
   }
 
-  sendOrder(data: any) {
-    return this.http.post(`${this.API_URL}/order/${this.ID}`, data);
+  sendOrder(data: any, fridgeId: string) {
+    return this.http.post(`${this.API_URL}/order/${fridgeId}`, data);
   }
 }

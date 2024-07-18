@@ -1,7 +1,14 @@
 <div class="header">
-  <p class="header-name">Назва магазину</p>
+  <p class="header-name">{{ fridgeId }}</p>
   <div class="header-cart">
-    <p class="header-cart-text">{{ totalPrice$ | async }}₴</p>
-    <p class="header-cart-img">🛒</p>
+    <span class="header-cart-text">Ваш вибір:</span>
+    <p class="header-cart-price">{{ totalPrice }}₴</p>
+    <!-- <div class="header-cart-wrapper">
+      <img
+        class="header-cart-img"
+        src="../../../assets/image/cart.png"
+        alt=""
+      />
+    </div> -->
   </div>
 </div>

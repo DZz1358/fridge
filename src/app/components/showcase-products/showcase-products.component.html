@@ -1,43 +1,49 @@
 <div class="container showcase-wrapper">
-  <div
-    class="card-wrapper"
-    *ngFor="let item of fridgeStore?.products; let i = index"
-  >
-    <div class="card">
-      <div class="card-img">
-        <img [src]="item.image" alt="" />
-      </div>
-      <div class="card-info">
-        <span class="card-info-title">{{ item.title }}</span>
+  <div *ngIf="!isLoading">
+    <div class="not-order" *ngIf="!fridgeStore.is_order_available">
+      <span>На данний момент замовлення недоступно</span>
+      <img src="../../../assets/image/sad-smile.png" alt="" />
+    </div>
 
-        <span class="card-info-description">{{ item.description }}</span>
-      </div>
-      <div class="card-footer">
-        <div class="card-footer-price">
-          <span class="card-footer-price__text">Ціна за шт:</span>
-          <span>{{ item.price }}₴</span>
-        </div>
-
-        <div class="card-footer-btn">
-          <div class="btn counter">
-            <button (click)="decrement(i)">-</button>
-            <span>{{ item.count || 0 }}</span>
-            <button (click)="increment(i)">+</button>
+    <ng-container *ngIf="fridgeStore.is_order_available">
+      <div
+        class="card-wrapper"
+        *ngFor="let item of fridgeStore?.products; let i = index"
+      >
+        <div class="card">
+          <div class="card-img">
+            <img [src]="item.image" alt="" />
           </div>
-          <button
-            class="btn"
-            [disabled]="item.count === 0"
-            (click)="addToCart(item, item.count)"
-          >
-            Додати в кошик
-          </button>
+          <div class="card-info">
+            <span class="card-info-title">{{ item.title }}</span>
+
+            <span class="card-info-description">{{ item.description }}</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-footer-price">
+              <span class="card-footer-price__text">Ціна за шт:</span>
+              <span>{{ item.price }}₴</span>
+            </div>
+
+            <div class="btn-wrapper">
+              <button class="btn counter" (click)="decrement(item.id)">
+                <span>-</span>
+              </button>
+              <span class="btn-wrapper-counter">{{ initCount(item) }}</span>
+
+              <button class="btn counter" (click)="increment(item)">
+                <span>+</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <!-- <button (click)="clearCart()">Очистити кошик</button> -->
+    </ng-container>
+
+    <div *ngIf="!isEmpty" class="btn-pay-wrapper">
+      <button class="btn btn-pay" (click)="toCart()">Перейти до оплати</button>
     </div>
   </div>
 
-  <button *ngIf="!isEmpty" class="btn btn-pay" [routerLink]="['/cart']">
-    Перейти до оплати
-  </button>
+  <div *ngIf="isLoading" class="loader"></div>
 </div>

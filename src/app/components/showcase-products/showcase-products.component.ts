@@ -1,10 +1,10 @@
 // showcase-products.component.ts
-import { Component, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FridgeService } from '../../services/fridge.service';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { RouterModule } from '@angular/router';
+import { Observable, Subscription, debounceTime, tap } from 'rxjs';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-showcase-products',
@@ -13,66 +13,76 @@ import { RouterModule } from '@angular/router';
   templateUrl: './showcase-products.component.html',
   styleUrls: ['./showcase-products.component.scss']
 })
-export class ShowcaseProductsComponent implements OnInit, OnChanges {
+export class ShowcaseProductsComponent implements OnInit {
 
   fridgeStore!: any;
   fridgeService = inject(FridgeService);
   public myForm!: FormGroup;
   cart$!: Observable<any[]>;
+  private subscriptions: Subscription = new Subscription();
 
+  public isLoading: boolean = true
   public isEmpty: boolean = true;
+  public cart: any = []
+  public fridgeId!: any;
 
-  constructor(private fb: FormBuilder) { }
-
-  ngOnChanges(changes: SimpleChanges): void {
-  }
+  constructor(private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
-    this.fridgeService.getFridgeStore('66a6805f-70e2-4670-923e-2910ee5ad79b').subscribe(arg => {
-      this.fridgeStore = arg;
-      this.initializeProductCounts();
+    this.fridgeService.currentFridgeId.subscribe(id => {
+      this.fridgeId = id;
     });
 
+    this.loadFridgeStore();
+    this.loadCart();
+
+  }
+
+
+  private loadCart() {
     this.cart$ = this.fridgeService.getCart();
     this.cart$.subscribe((cart) => {
+      if (Array.isArray(cart)) {
+        this.cart = cart;
+      }
       this.isEmpty = cart.length > 0 ? false : true;
     })
-
   }
 
-  initializeProductCounts() {
-    if (this.fridgeStore?.products) {
-      this.fridgeStore.products.forEach((product: any) => {
-        if (product.count === undefined) {
-          product.count = 0;
-        }
-      });
-    }
+  private loadFridgeStore(): void {
+    this.subscriptions.add(
+      this.fridgeService.getFridgeStore(this.fridgeId)
+        .pipe(
+          tap(() => this.isLoading = true),
+          debounceTime(300)
+        )
+        .subscribe(store => {
+          this.fridgeStore = store;
+          this.isLoading = false;
+        })
+    );
   }
 
-  increment(index: number) {
-    this.fridgeStore.products[index].count++;
-  }
-
-  decrement(index: number) {
-    if (this.fridgeStore.products[index].count > 0) {
-      this.fridgeStore.products[index].count--;
-    }
-  }
-
-  addToCart(item: any, quantity: number) {
-    let product = {
-      ...item,
-      qty: quantity
-    }
-    this.fridgeService.addToCart(product);
-    item.count = 0;
-    this.cart$ = this.fridgeService.getCart();
+  initCount(product: any) {
+    const match = this.cart.find((item: any) => item.id === product.id)
+    return match ? match.count : 0;
   }
 
 
-  clearCart() {
-    this.fridgeService.clearCart();
+  increment(item: any) {
+    this.fridgeService.addToCart(item);
+  }
+
+  decrement(index: string) {
+    this.fridgeService.removeFromCart(index);
+  }
+
+  toCart() {
+    this.router.navigate([`fridge-menu/${this.fridgeId}/cart`]);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
 }
