@@ -3,6 +3,7 @@ import { FridgeService } from '../../services/fridge.service';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Observable, map } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { IProduct } from '../../models/fridge.interfaces';
 
 @Component({
   selector: 'app-cart',
@@ -12,11 +13,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
   styleUrl: './cart.component.scss'
 })
 export class CartComponent implements OnInit {
-  cart$!: Observable<any[]>;
+  cart$!: Observable<IProduct[]>;
   totalPrice: number = 0;
 
   fridgeId!: string;
-  fridgeName: any = '';
   fridgeService = inject(FridgeService);
 
   constructor(private router: Router, private route: ActivatedRoute,) {
@@ -33,7 +33,7 @@ export class CartComponent implements OnInit {
 
   }
 
-  increment(item: any) {
+  increment(item: IProduct) {
     this.fridgeService.addToCart(item);
   }
 

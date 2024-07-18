@@ -2,9 +2,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FridgeService } from '../../services/fridge.service';
 import { NgFor, NgIf } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subscription, debounceTime, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { IFridge, IProduct } from '../../models/fridge.interfaces';
 
 @Component({
   selector: 'app-showcase-products',
@@ -15,16 +15,15 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 })
 export class ShowcaseProductsComponent implements OnInit {
 
-  fridgeStore!: any;
+  fridgeStore!: IFridge;
   fridgeService = inject(FridgeService);
-  public myForm!: FormGroup;
   cart$!: Observable<any[]>;
   private subscriptions: Subscription = new Subscription();
 
   public isLoading: boolean = true
   public isEmpty: boolean = true;
-  public cart: any = []
-  public fridgeId!: any;
+  public cart: IProduct[] = []
+  public fridgeId!: string;
 
   constructor(private route: ActivatedRoute, private router: Router) { }
 

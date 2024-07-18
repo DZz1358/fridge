@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import { IFridge } from '../models/fridge.interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +80,7 @@ export class FridgeService {
   }
 
   getFridgeStore(id: string) {
-    return this.http.get(`${this.API_URL}/fridge/${id}/store`);
+    return this.http.get<IFridge>(`${this.API_URL}/fridge/${id}/store`);
   }
 
   sendOrder(data: any, fridgeId: string) {

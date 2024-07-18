@@ -3,6 +3,7 @@ import { FridgeService } from '../../services/fridge.service';
 import { Observable, map } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { IProduct } from '../../models/fridge.interfaces';
 
 @Component({
   selector: 'app-header',
@@ -12,13 +13,12 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit {
-  cart$: Observable<any[]>;
+  cart$: Observable<IProduct[]>;
   totalPrice!: number;
   fridgeService = inject(FridgeService);
-  fridgeName!: any;
-  fridgeId!: any;
+  fridgeId!: string;
 
-  constructor(private route: ActivatedRoute) {
+  constructor() {
     this.cart$ = this.fridgeService.getCart();
 
     this.fridgeService.currentFridgeId.subscribe(id => {
