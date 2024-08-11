@@ -2,13 +2,6 @@
   <p class="header-name">{{ fridgeId }}</p>
   <div class="header-cart">
     <span class="header-cart-text">Ваш вибір:</span>
-    <p class="header-cart-price">{{ totalPrice }}₴</p>
-    <!-- <div class="header-cart-wrapper">
-      <img
-        class="header-cart-img"
-        src="../../../assets/image/cart.png"
-        alt=""
-      />
-    </div> -->
+    <p class="header-cart-price">{{ totalPrice || 0 }}₴</p>
   </div>
 </div>

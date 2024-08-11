@@ -1,0 +1,48 @@
+<div class="container">
+  <div *ngIf="!isLoading">
+    <h4 class="fridge-name">{{ orderId }}</h4>
+
+    <div class="payment-info">
+      <span class="payment-info-text">Кіл-ть товару:</span>
+      <span class="payment-info-qty">{{ order?.qty }}</span>
+    </div>
+    <div class="payment-info">
+      <span class="payment-info-text">Сума:</span>
+      <span class="payment-info-qty">{{ order?.sum }}</span>
+    </div>
+    <div class="payment-info payment-status">
+      <span class="payment-info-text">Статус оплати:</span>
+      <span class="payment-info-qty">{{
+        order?.payment_status | paymentStatus
+      }}</span>
+    </div>
+
+    <div
+      *ngIf="order?.payment_status === 0 || order?.payment_status === 1"
+      class="payment-status"
+    >
+      <span class="payment-status-text">Перевіряємо статус оплати</span>
+      <div class="loader"></div>
+    </div>
+
+    <div *ngIf="order?.payment_status === 2" class="payment-status">
+      <span class="payment-status-text">Замовлення оплачено</span>
+      <div>
+        <img src="../../../assets/image/successful.png" alt="" />
+      </div>
+    </div>
+
+    <div *ngIf="order?.payment_status === 3" class="payment-status">
+      <span class="payment-status-text">Помилка оплати</span>
+      <img src="../../../assets/image/sad-smile.png" alt="" />
+    </div>
+
+    <div *ngIf="order?.payment_status === 2" class="btn-pay-wrapper">
+      <button class="btn btn-pay" (click)="openDialog()">
+        Відкрити двері холодильника
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loader-spinner"></div>
+</div>

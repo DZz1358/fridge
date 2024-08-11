@@ -1,9 +1,8 @@
-import { Component, OnChanges, OnInit, SimpleChanges, computed, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FridgeService } from '../../services/fridge.service';
 import { Observable, map } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { IProduct } from '../../models/fridge.interfaces';
 
 @Component({
   selector: 'app-header',
@@ -12,26 +11,31 @@ import { IProduct } from '../../models/fridge.interfaces';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnInit {
-  cart$: Observable<IProduct[]>;
-  totalPrice!: number;
+export class HeaderComponent {
+  cart$: Observable<any[]>;
+  totalPrice: number = 0;
   fridgeService = inject(FridgeService);
-  fridgeId!: string;
+  fridgeName!: any;
+  fridgeId!: any;
 
-  constructor() {
+  constructor(private route: ActivatedRoute) {
     this.cart$ = this.fridgeService.getCart();
+    this.fridgeService.getCart().subscribe();
 
     this.fridgeService.currentFridgeId.subscribe(id => {
       this.fridgeId = id;
+      if (this.fridgeId) {
+        this.getTotalCount(this.fridgeId);
+      }
     });
-
-    this.cart$.subscribe((res: any) => {
-      this.totalPrice = res.reduce((acc: any, curr: any) => acc + (+curr.price * curr.count), 0)
-    })
-
   }
 
-  ngOnInit(): void {
-    this.fridgeService.getCart().subscribe();
+  getTotalCount(fridgeId: string) {
+    this.cart$.subscribe((res: any) => {
+      let currentCart = res.find((item: { fridgeId: any; }) => {
+        return item.fridgeId === fridgeId
+      });
+      this.totalPrice = currentCart?.products.reduce((acc: any, curr: any) => acc + (+curr.price * curr.count), 0)
+    })
   }
 }

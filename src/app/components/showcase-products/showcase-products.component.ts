@@ -2,39 +2,44 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FridgeService } from '../../services/fridge.service';
 import { NgFor, NgIf } from '@angular/common';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subscription, debounceTime, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { IFridge, IProduct } from '../../models/fridge.interfaces';
+import { ICart, IFridge, IProduct } from '../../models/fridge.interface';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-showcase-products',
   standalone: true,
-  imports: [NgFor, RouterModule, NgIf],
+  imports: [NgFor, RouterModule, NgIf, HeaderComponent],
   templateUrl: './showcase-products.component.html',
   styleUrls: ['./showcase-products.component.scss']
 })
 export class ShowcaseProductsComponent implements OnInit {
 
-  fridgeStore!: IFridge;
+  fridgeStore!: IProduct[];
   fridgeService = inject(FridgeService);
   cart$!: Observable<any[]>;
   private subscriptions: Subscription = new Subscription();
 
   public isLoading: boolean = true
   public isEmpty: boolean = true;
-  public cart: IProduct[] = []
-  public fridgeId!: string;
+  public cart: ICart[] = []
+  public fridgeId!: string | null;
+  public isAvailable: boolean = false;
 
   constructor(private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
-    this.fridgeService.currentFridgeId.subscribe(id => {
-      this.fridgeId = id;
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id')!;
+      this.fridgeId = id
+      this.fridgeService.changeFridgeId(this.fridgeId);
+      this.fridgeService.checkCartTime(this.fridgeId)
     });
 
     this.loadFridgeStore();
     this.loadCart();
-
   }
 
 
@@ -49,21 +54,28 @@ export class ShowcaseProductsComponent implements OnInit {
   }
 
   private loadFridgeStore(): void {
-    this.subscriptions.add(
-      this.fridgeService.getFridgeStore(this.fridgeId)
-        .pipe(
-          tap(() => this.isLoading = true),
-          debounceTime(300)
-        )
-        .subscribe(store => {
-          this.fridgeStore = store;
-          this.isLoading = false;
-        })
-    );
+    if (this.fridgeId) {
+      this.subscriptions.add(
+        this.fridgeService.getFridgeStore(this.fridgeId)
+          .pipe(
+            tap(() => this.isLoading = true),
+            debounceTime(300)
+          )
+          .subscribe(store => {
+            this.isAvailable = store.is_order_available
+            this.fridgeStore = store.products;
+            this.isLoading = false;
+          })
+      );
+    }
+
   }
 
   initCount(product: any) {
-    const match = this.cart.find((item: any) => item.id === product.id)
+    const currentFridge = this.cart.find((item: any) => {
+      return item.fridgeId === this.fridgeId
+    })
+    const match = currentFridge?.products.find((item: any) => item.id === product.id)
     return match ? match.count : 0;
   }
 

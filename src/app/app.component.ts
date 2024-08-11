@@ -14,18 +14,10 @@ import { FridgeService } from './services/fridge.service';
 })
 export class AppComponent implements OnInit {
   title = 'fridge';
-  constructor(private route: ActivatedRoute, private router: Router) { }
-  private fridgeId!: string;
-
-  fridgeService = inject(FridgeService);
-
+  constructor() {
+  }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      this.fridgeId = id ? id : '66a6805f-70e2-4670-923e-2910ee5ad79b';
-      this.fridgeService.changeFridgeId(this.fridgeId);
-      this.router.navigate([`fridge-menu/${this.fridgeId}`]);
-    });
   }
+
 }

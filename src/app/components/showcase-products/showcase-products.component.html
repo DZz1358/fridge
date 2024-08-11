@@ -1,15 +1,14 @@
+<app-header></app-header>
+
 <div class="container showcase-wrapper">
   <div *ngIf="!isLoading">
-    <div class="not-order" *ngIf="!fridgeStore.is_order_available">
+    <div class="not-order" *ngIf="!isAvailable">
       <span>На данний момент замовлення недоступно</span>
       <img src="../../../assets/image/sad-smile.png" alt="" />
     </div>
 
-    <ng-container *ngIf="fridgeStore.is_order_available">
-      <div
-        class="card-wrapper"
-        *ngFor="let item of fridgeStore?.products; let i = index"
-      >
+    <ng-container *ngIf="isAvailable">
+      <div class="card-wrapper" *ngFor="let item of fridgeStore; let i = index">
         <div class="card">
           <div class="card-img">
             <img [src]="item.image" alt="" />
@@ -40,7 +39,7 @@
       </div>
     </ng-container>
 
-    <div *ngIf="!isEmpty" class="btn-pay-wrapper">
+    <div *ngIf="!isEmpty && isAvailable" class="btn-pay-wrapper">
       <button class="btn btn-pay" (click)="toCart()">Перейти до оплати</button>
     </div>
   </div>

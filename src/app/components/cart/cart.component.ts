@@ -1,39 +1,48 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FridgeService } from '../../services/fridge.service';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Observable, map } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { IProduct } from '../../models/fridge.interfaces';
+import { Observable, map } from 'rxjs';
+import { IProduct } from '../../models/fridge.interface';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [NgFor, NgIf, RouterModule, AsyncPipe],
+  imports: [NgFor, NgIf, RouterModule, AsyncPipe, HeaderComponent],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
 })
 export class CartComponent implements OnInit {
-  cart$!: Observable<IProduct[]>;
+  cart$!: Observable<any[]>;
   totalPrice: number = 0;
-
-  fridgeId!: string;
+  public currentCart: IProduct[] = []
+  fridgeId!: any;
+  fridgeName: any = '';
   fridgeService = inject(FridgeService);
 
   constructor(private router: Router, private route: ActivatedRoute,) {
   }
   ngOnInit(): void {
     this.cart$ = this.fridgeService.getCart();
-    this.cart$.subscribe((res: any) => {
-      this.totalPrice = res.reduce((acc: any, curr: any) => acc + (+curr.price * curr.count), 0)
-    })
 
     this.route.paramMap.subscribe(params => {
-      this.fridgeId = params.get('id')!;
+      const id = params.get('id')!;
+      this.fridgeId = id
+      this.fridgeService.changeFridgeId(this.fridgeId);
     });
 
+    this.cart$.subscribe((res: any) => {
+      let currentCart = res.find((item: { fridgeId: any; }) => {
+        return item.fridgeId === this.fridgeId
+      });
+
+      this.currentCart = currentCart.products;
+      this.totalPrice = currentCart.products.reduce((acc: any, curr: any) => acc + (+curr.price * curr.count), 0)
+    })
   }
 
-  increment(item: IProduct) {
+  increment(item: any) {
     this.fridgeService.addToCart(item);
   }
 
@@ -44,20 +53,17 @@ export class CartComponent implements OnInit {
   sendOrder() {
     let order: { id: any; qty: any; }[] = []
 
-    this.cart$.subscribe((res: any) => {
-      res.forEach((item: any) => {
-        order.push({
-          id: item.id,
-          qty: item.count
-        })
-      });
-    })
+    this.currentCart.forEach((item: any) => {
+      order.push({
+        id: item.id,
+        qty: item.count
+      })
+    });
 
     this.fridgeService.sendOrder(order, this.fridgeId).subscribe((res: any) => {
       let url = res.payment_link
       window.location.href = url;
     })
-    console.log('order', order);
   }
 
 
@@ -66,7 +72,7 @@ export class CartComponent implements OnInit {
   }
 
   clearCart() {
-    this.fridgeService.clearCart();
+    this.fridgeService.clearCurrentCart();
   }
 
 

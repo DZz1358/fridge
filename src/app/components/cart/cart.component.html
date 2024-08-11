@@ -1,8 +1,10 @@
+<app-header></app-header>
+
 <div class="container">
   <div *ngIf="totalPrice !== 0">
     <p class="order-header">Ваше замовлення</p>
 
-    <div class="card" *ngFor="let item of cart$ | async">
+    <div class="card" *ngFor="let item of currentCart">
       <div class="card-image">
         <img [src]="item.image" alt="" />
       </div>
@@ -15,11 +17,7 @@
           <div class="card-info-price_count">
             <span>{{ item.price }}₴</span>
             <span class="x">за шт.</span>
-            <!-- <span>{{ item.count }}</span> -->
           </div>
-          <!-- <div class="card-info-total">
-            <span>{{ item.price * item.count }}₴</span>
-          </div> -->
         </div>
         <div class="btn-wrapper">
           <button class="btn counter" (click)="decrement(item.id)">-</button>
